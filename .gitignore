@@ -1,0 +1,46 @@
+# Local credentials and environments
+.env
+.env.*
+!.env.example
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.DS_Store
+node_modules/
+
+# Data and generated research artifacts are never release inputs.
+data/*
+!data/.gitkeep
+library/data/*
+!library/data/.gitkeep
+sequential/data/*
+!sequential/data/.gitkeep
+*.xml
+*.plist
+*.db
+*.db-*
+*.sqlite*
+*.h5
+*.hdf5
+*.npy
+*.npz
+*.pt
+*.pth
+*.pkl
+*.pickle
+*.safetensors
+*.mp3
+*.wav
+*.flac
+*.m4a
+*.log
+*.jsonl
+*.zip
+*.tar*
+
+# Private operational material
+.claude/
+.marty/
+collaboration_files/
+design-input/

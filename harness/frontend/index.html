@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Melody Matcher Harness</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap">
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+
+<style>
+  :root {
+    --bg: oklch(0.985 0.006 80);
+    --bg-sunken: oklch(0.965 0.008 75);
+    --card: oklch(1 0 0);
+    --card-warm: oklch(0.98 0.01 70);
+    --border: oklch(0.92 0.008 75);
+    --border-strong: oklch(0.86 0.012 70);
+    --ink: oklch(0.22 0.015 45);
+    --ink-soft: oklch(0.42 0.015 50);
+    --ink-mute: oklch(0.58 0.012 55);
+    --accent: oklch(0.58 0.15 28);
+    --accent-soft: oklch(0.94 0.04 30);
+    --accent-ink: oklch(0.35 0.12 28);
+    --good: oklch(0.62 0.12 150);
+    --bad: oklch(0.58 0.14 25);
+    --radius: 14px;
+    --radius-sm: 10px;
+    --radius-lg: 22px;
+    --shadow-sm: 0 1px 2px oklch(0.2 0.02 50 / 0.04), 0 1px 3px oklch(0.2 0.02 50 / 0.03);
+    --shadow-md: 0 2px 6px oklch(0.2 0.02 50 / 0.05), 0 10px 30px oklch(0.2 0.02 50 / 0.06);
+    --shadow-lg: 0 4px 10px oklch(0.2 0.02 50 / 0.06), 0 30px 60px oklch(0.2 0.02 50 / 0.08);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--ink); }
+  body {
+    font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+    font-feature-settings: "ss01", "cv11";
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.45;
+  }
+  .serif { font-family: "Instrument Serif", "Iowan Old Style", Georgia, serif; font-weight: 400; letter-spacing: -0.01em; }
+  .mono { font-family: "JetBrains Mono", ui-monospace, Menlo, monospace; font-variant-numeric: tabular-nums; }
+  button { font-family: inherit; font-size: inherit; color: inherit; }
+
+  #root { min-height: 100vh; }
+</style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script>
+    window.__HARNESS_TWEAKS__ = { cardStyle: "list" };
+  </script>
+
+  <script type="text/babel" data-presets="react" src="/src/api.js"></script>
+  <script type="text/babel" data-presets="react" src="/src/data.jsx"></script>
+  <script type="text/babel" data-presets="react" src="/src/bits.jsx"></script>
+  <script type="text/babel" data-presets="react" src="/src/connect.jsx"></script>
+  <script type="text/babel" data-presets="react" src="/src/sidepanel.jsx"></script>
+  <script type="text/babel" data-presets="react" src="/src/results.jsx"></script>
+  <script type="text/babel" data-presets="react" src="/src/app.jsx"></script>
+</body>
+</html>
