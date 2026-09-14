@@ -24,7 +24,7 @@
 
 ## Exposure-conditioned return and replay
 
-**Proposed, July 13, 2026:** predict return within a fixed future horizon and conditional future play count/rate after a known observed exposure. No retained trainer or prepared dataset implements this target. The event collector and schema are only potential inputs.
+**Proposed by Marty, July 13, 2026, in response to Mo's thesis and raw-behavior proposal; not an adopted or executed experiment:** predict return within a fixed future horizon and conditional future play count/rate after a known observed exposure. No retained trainer or prepared dataset implements this target. The event collector and schema are only potential inputs.
 
 **Motivation:** keep behavioral evidence closer to its recorded form and reduce the ambiguity between an unseen song and a rejected song. Counts still reflect opportunity, activity, habit, and availability.
 

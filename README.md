@@ -2,6 +2,8 @@
 
 Can a model learn which aspects of a song matter to a listener from audio representations and listening behavior? Melody Matcher explores that question with candidate-conditioned attention over a listener's music library.
 
+The motivating frustration is a recommendation that resembles something you play but misses what makes it matter to you. Songs can connect personally across very different styles. Our thesis is that sufficiently capable models could learn those listener- and candidate-specific connections from audio and scalable listening evidence, without people first defining the relevant musical rules. Broad categories, one global similarity measure, and co-listening patterns each leave parts of that question open; this is a research motivation, not evidence that modern systems ignore audio or that this approach is superior.
+
 **This is unfinished, paused research, not a working or supported recommender.** The source is shared to make the approach, experiments, and unresolved questions understandable. Recommendation quality has not been validated. No installation, training run, harness session, or benchmark was reproduced for this snapshot.
 
 The most instructive historical observation is a mismatch: an April 2026 record reported validation Spearman of 0.719, while listening inspection found narrowly clustered, unsatisfactory recommendations. That metric is an unverified historical report, and the cause of the failure remains unresolved. See [Research](docs/RESEARCH.md).
