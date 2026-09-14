@@ -1,18 +1,18 @@
 # Melody Matcher
 
-I think Spotify and Apple Music recommendations are pretty shit. I keep discovering songs I absolutely love that have been sitting there for decades. They didn't need to be written. They needed to be recommended to me.
+Spotify and Apple Music recommendations suck. I keep discovering songs I absolutely love that have been sitting there for decades. They didn't need to be written. They needed to be recommended to me.
 
-I don't know why I love both HARDY's "Favorite Country Song" and Aretha Franklin's "Don't Play That Song," but I'm pretty confident there's something in the music's **DNA** that explains it. Not a genre label. Not a "danceability" score. Something my brain hears even when I can't put it into words.
+I love both HARDY's "Favorite Country Song" and Aretha Franklin's "Don't Play That Song," without being able to explain what connects them. That's the music's **DNA**: something the brain hears that a genre label or a "danceability" score fails to describe.
 
-A friend who knows your taste can hear a song and think, *you need to hear this*. They've built a mental model of what hits for you. I believe we can train a neural network to learn those connections from the music itself and the music people actually return to, without first teaching it our vocabulary for describing songs. That's the bet behind Melody Matcher.
+A friend who knows your taste can hear a song and immediately know you need to hear it. Train a neural network to learn those connections from the music itself and people's listening behavior, without first teaching it our vocabulary for describing songs. That's the bet behind Melody Matcher.
 
-The ambition goes beyond another playlist. Sometimes I'm obsessed with one song and want something that scratches the same itch before I play it to death. Sometimes I want a song from somewhere I'd never have thought to look. A good model of musical DNA should let us explore both. [The thesis and the reasoning](docs/RESEARCH.md) explain what I mean, what we tried, and where we got stuck.
+The ambition goes beyond another playlist. When you're obsessed with a song, find something that gives you the same feeling before you play it to death. Or reach further out and discover music you'd never have thought to look for. [The thesis and the reasoning](docs/RESEARCH.md) explain the idea, what we tried, and where we got stuck.
 
-I also think the same logic could reach far beyond music: books, movies, maybe even clothes. Represent the thing richly, then train a large neural network to learn how people's preferences relate to it. Music is the first place we're trying to make that work, not the limit of the idea.
+If this works, the same principle can extend to books, movies, maybe even clothes: represent the thing richly, then train a large neural network to learn how people's preferences relate to it. Music is the first test.
 
-**The thesis is alive. The project is paused, and the recommender doesn't work well.** Our current suspicion is that we don't have the right listening data, or enough of it, to train the model properly. Making the network bigger without solving that doesn't get us anywhere. We're sharing the source and thinking so somebody else can work from them, not because we're pretending to have solved music discovery.
+**The project is paused, and the recommender doesn't work well.** The current hypothesis is that we lack the right listening data, or enough of it, to train the model properly. Scaling the network without scaling that evidence doesn't get us anywhere. We're sharing the source and thinking so someone else can work from them.
 
-This is an opinionated research project, not a supported product. The source uses audio embeddings and candidate-conditioned attention over a listener's library. The historical trials, limitations, and possible next experiments are documented below; no new benchmark or runtime validation was performed for this release.
+The source uses audio embeddings and candidate-conditioned attention over a listener's library. The docs cover the historical trials, limitations, and possible next experiments. This is unfinished research; the experiments weren't rerun for this release.
 
 ## Read the research
 
