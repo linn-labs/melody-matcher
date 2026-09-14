@@ -21,7 +21,7 @@ Rate limits and runtime estimates in source are historical assumptions, not curr
 
 ## Training and expected artifacts
 
-The [library source](../library/src) implements score transforms, prepared per-user libraries, random windows, batching, the attention model, and two output-head choices. [Training scripts](../library/scripts) provide training loops and historical experiment orchestration. None of the following artifacts is supplied:
+The [library source](../library/src) implements score transforms, prepared per-user libraries, random windows, batching, the attention model, and two output-head choices. [Training scripts](../library/scripts) provide training loops and historical experiment orchestration. None of the following artifacts are supplied:
 
 | Expected path | Schema or shape in retained code |
 | --- | --- |

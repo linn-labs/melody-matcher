@@ -1,6 +1,6 @@
 # Data and rights
 
-Review date: **September 13, 2026**. This is a bounded documentation review for a source-only research snapshot, not a determination that prior or future data processing is authorized.
+Documentation updated **September 14, 2026**. The external terms and license review below was conducted on **September 13, 2026**; this editorial update does not claim those sources were checked again. This is a bounded review for a source-only research snapshot, not a determination that prior or future data processing is authorized.
 
 The [MIT license](../LICENSE) applies to owned source and documentation from Linn Autoracing Excellence LLC. It does not grant rights to service data, audio, model weights, external code, trademarks, or derived embeddings/checkpoints. No commercial clearance of the complete research pipeline is claimed.
 

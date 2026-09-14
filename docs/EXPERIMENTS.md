@@ -1,57 +1,72 @@
-# Experiments and open questions
+# Experiments in the order the questions changed
 
-**Implemented** below means source exists, not that this release ran it. **Historically reported** means a dated record describes an attempt or observation with unavailable reproduction artifacts. **Proposed** means a future test. No new results were produced for this snapshot.
+**[Read the full research history first](HISTORY.md).** This is its compact navigation companion, not a replacement for the explanations. Each stage links to what we believed, what was attempted, what changed our understanding, and what remains unresolved.
 
-## Sampling and coverage
+**Implemented** means source exists. **Historically reported** means a working record describes an attempt or observation whose reproduction artifacts are absent. **Proposed** means a possible future test, not a completed result. No experiments were rerun for this snapshot.
 
-**Implemented:** [discovery](../scripts/01_discover_users.py), [diversity scoring](../scripts/03_score_diversity.py), [taste snowball](../scripts/05_taste_snowball.py), [spot checks](../scripts/spot_check_snowball.py), and [dataset variants](../library/scripts/dataset_experiments.py). Source includes broad curated seeds, diversity gates, target-library overlap cohorts, friend expansion, and long-tail seed selection. Personal-library-derived region-fill defaults were removed; that strategy now needs explicitly supplied seeds.
+## 1. Can audio and listening histories provide the evidence?
 
-**Motivation and evidence:** the April 22, 2026 listening report described poor, clustered recommendations and suspected sampling bias. The collection and variant code shows attempts to change coverage, but no retained dataset or trial artifacts establish their effect.
+The early plan paired pretrained audio representations with aggregate Last.fm counts. March collection revealed uneven discovery and an active-listener skew; expired preview URLs then separated “matched” tracks from actually embedded ones.
 
-**Confounds:** seed popularity, preview availability, fuzzy-match errors, user activity, overlapping cohorts, and selection around a single target library can all change the problem. The SQL filter admits users with missing diversity scores regardless of cohort, despite its narrower comment.
+- **History:** [early plan](HISTORY.md#1-early-plan-learn-taste-from-music-and-listening-behavior) and [March collection](HISTORY.md#2-march-a-broad-dataset-was-already-a-selected-dataset).
+- **Detail:** [collection and representations](COMPONENTS.md#collection-and-representations).
+- **Status:** collection/embedding source exists; historical checkpoints describe partial progress, not a supplied dataset or a complete sequential model.
+- **Unresolved:** what evidence is lost or selected by user discovery, matching, and preview availability?
 
-**Next test:** compare two predeclared sampling policies at equal event and embedding budgets, on the same frozen evaluation listeners/candidates. Report coverage and matching error separately from predictive lift, with per-listener uncertainty. A broader sample improving both coverage and controlled outcomes would support a sampling explanation more strongly than a new top-50 anecdote.
+## 2. Can candidate attention learn what a pooled taste vector misses?
 
-## Target transforms, negatives, and hurdle heads
+April's design replaced one taste vector with library self-attention and candidate cross-attention. FiLM and score bias made counts influence representation and attention differently. The first supervised task predicted held-out library scores without sampled negatives.
 
-**Implemented:** four score transforms and track filters in [preprocessing](../library/src/preprocessing.py); 17 dataset definitions in [dataset experiments](../library/scripts/dataset_experiments.py); negative counts 0, 30, 90, 270, and 900 plus a 270-negative hurdle variant in [negative experiments](../library/scripts/negative_sampling_experiments.py). The harness supports probability, joint-product, and thresholded-score ranking.
+- **History:** [April design and its assumptions](HISTORY.md#3-april-7-9-score-a-candidate-against-the-library).
+- **Detail:** [original regression task](TRAINING_EXPERIMENTS.md#the-original-library-regression-task) and [implemented architecture](RESEARCH.md#implemented-architecture).
+- **Status:** attention and regression are implemented; the proposed per-listener linear baseline was not completed.
+- **Unresolved:** do those mechanisms beat simpler pooling, linear prediction, or less elaborate score conditioning under the same evaluation?
 
-**Motivation and evidence:** within-library score regression may not separate desirable catalog songs from merely absent ones. The code implements these comparisons; their results are absent. Historical plans disagreed about negative sampling.
+## 3. Does a better validation number mean better recommendations?
 
-**Confounds:** absence does not imply dislike. Prepared-library filtering can remove known tracks before negative rejection. Negative ratios alter the classification prior; duplicate draws and random evaluation windows affect metrics. Different score transforms define different targets, so comparing their raw losses or correlations is not an apples-to-apples preference test. Some ratio labels in the source reverse positive/negative notation; the configured counts are the reliable specification.
+The April 22 checkpoint reports an 18-trial sweep with best validation Spearman of 0.719. The subsequent listening test produced poor recommendations clustered in a narrow slow instrumental/background style. The held-out numerical score looked promising; the music sounded bad.
 
-**Next test:** freeze one common evaluation target/candidate construction, then compare regression with and without negatives and the two-head loss across repeated seeds. Evaluate ranking and calibration under the evaluation sampling prior. Keep a separate audit of known-track false negatives; do not interpret the classifier as exposure-aware.
+- **History:** [the sweep and listening failure](HISTORY.md#4-april-22-the-number-looked-promising-the-music-was-bad).
+- **Detail:** [first sweep](TRAINING_EXPERIMENTS.md#the-first-hyperparameter-sweep) and [actual metric semantics](TRAINING_EXPERIMENTS.md#what-the-metrics-actually-measure).
+- **Status:** historically reported result; evaluated weights, logs, recommendation lists, and exact data are absent.
+- **Unresolved:** how much of the apparent progress was specific to ranking known-library targets rather than finding satisfying new music?
 
-## Exposure-conditioned return and replay
+## 4. Was the model learning the wrong training distribution?
 
-**Proposed by Marty, July 13, 2026, in response to Mo's thesis and raw-behavior proposal; not an adopted or executed experiment:** predict return within a fixed future horizon and conditional future play count/rate after a known observed exposure. No retained trainer or prepared dataset implements this target. The event collector and schema are only potential inputs.
+The first response prioritized relevant supervision rather than more tuning. Catalog overlap had been partly engineered and did not prove the training labels covered the listener's taste. A revised snowball collected tagged cohorts based on different sampling theories.
 
-**Motivation:** keep behavioral evidence closer to its recorded form and reduce the ambiguity between an unseen song and a rejected song. Counts still reflect opportunity, activity, habit, and availability.
+- **History:** [coverage versus supervision](HISTORY.md#5-april-22-separate-catalog-coverage-from-useful-supervision) and [the revised collection](HISTORY.md#6-april-27-and-subsequent-source-revise-the-snowball-then-compare-dataset-theories).
+- **Detail:** [what snowball means, step by step](SAMPLING.md), including [the overlap denominator and false breadth guarantee](SAMPLING.md#what-overlap-means-in-this-implementation).
+- **Status:** the revised plan and collector exist. Comparative cohort outcomes are not supplied; distribution collapse remains a diagnosis, not a proven cause.
+- **Unresolved:** does changing the sample improve prediction on independently fixed listeners and candidates, rather than just change coverage?
 
-**Next test:** construct a consented or otherwise appropriately authorized pilot with one frozen cutoff/horizon policy. Compare a popularity/activity/prior-count baseline to an audio-aware model using only pre-cutoff features. Define observation coverage, censoring, missing events, and what “first exposure” means before fitting anything. Measure return calibration and conditional-count error separately; a Poisson count baseline and an over-dispersed alternative are proposals, not existing heads.
+## 5. Which users, tracks, and score transforms should supply the targets?
 
-## Set versus sequence and dimensional selectivity
+The dataset script defines 17 variants: original versus expanded pools, overlap and diversity filters, activity filters, low-play removal, alternative target transforms, and combinations. A shared recipe was intended to make sampling theories easier to compare.
 
-**Implemented:** score-conditioned FiLM, self-attention without positional encoding, and candidate cross-attention in [model.py](../library/src/model.py). [Scrobble collection](../sequential/scripts/01_collect_scrobbles.py) records timestamps but does not supply a sequence model.
+- **History:** [dataset comparisons after snowball](HISTORY.md#6-april-27-and-subsequent-source-revise-the-snowball-then-compare-dataset-theories).
+- **Detail:** [every dataset-variant family and its question](TRAINING_EXPERIMENTS.md#dataset-variants-what-each-change-was-meant-to-test).
+- **Status:** implemented definitions, not a verified complete outcome ledger.
+- **Unresolved:** which choices help on a common evaluation target? Different transformed targets and selected users make raw metric comparisons misleading.
 
-**Motivation:** aggregate taste need not depend on arbitrary library order; immediate listening context may depend on actual event order. Candidate attention could select relevant parts of a diverse history, but that interpretation has not been measured.
+## 6. What does the model know about candidates outside the library?
 
-**Next test:** first test permutation consistency with dropout disabled and embeddings/scores/masks permuted together. Then compare a pooled-history baseline, the current attention structure, and ablations of FiLM and score bias at matched budgets. A separately designed timestamp-aware sequence branch should be compared on session prediction, with an explicit distinction from durable-taste evaluation. Inspect predictive changes under ablation rather than treating attention maps as explanations.
+The later target plan revisited the no-negatives decision. It introduced random catalog targets and a two-head hurdle variant to separate sampled membership from positive-score regression. Unheard still did not mean disliked; the missing discrimination task had become another cost to measure.
 
-## Model and data scale
+- **History:** [why negatives came back](HISTORY.md#7-later-target-pivot-reintroduce-negatives-and-split-the-heads).
+- **Detail:** [negative budgets, losses, ranking choices, and metrics](TRAINING_EXPERIMENTS.md#negative-sampling-and-the-hurdle-model).
+- **Status:** five single-head negative budgets and a 270-negative hurdle variant are implemented. Their comparative results are absent; the plan has no reliable experiment date.
+- **Unresolved:** can the model discriminate useful candidates without learning false-negative or sampling-prior shortcuts? Does a separate regression head help under a fixed evaluation?
 
-The project is paused over data access and scale. The current hypothesis is that the downstream model is too large for the available user evidence, while the larger thesis needs far more and better data than we can obtain. A model-size comparison would help diagnose this; scaling parameters requires scaling the evidence too. [The research account](RESEARCH.md) explains how we got here.
+## 7. Are we asking the right question at a meaningful scale?
 
-**Implemented:** [hyperparameter sweep definitions](../library/scripts/hyperparam_sweep.py) vary optimization and architecture, including hidden width and depth. **Historically reported:** the April checkpoint reported an 18-trial sweep and a 0.719 best validation Spearman. It supplies no controlled scaling law, and the current sweep has a preserved return-value mismatch described in [Components](COMPONENTS.md).
+May's scale discussion and Moritz's July reset moved the focus from product ergonomics to proving the thesis. Use scalable behavioral evidence, try raw counts and metadata rather than a handcrafted preference score, and confront the amount and quality of data needed for a capable network.
 
-**Confounds:** data quality, label definition, training compute, optimization, and evaluation difficulty can dominate apparent size effects. The selected external MERT encoder's 330M designation is not the size of the downstream taste model.
+- **History:** [the later reset and pause](HISTORY.md#8-may-and-july-reconsider-the-evidence-and-the-scale-of-the-test).
+- **Detail:** [Marty's proposed exposure-conditioned return/replay test](FUTURE_PROOF.md), its data contract, baselines, and model/data ladder.
+- **Status:** proposal, not an adopted or executed experiment. It is not the target of the existing hurdle code.
+- **Unresolved:** can audio improve future behavior prediction beyond popularity and collaborative baselines, and does that improvement translate into music people actually enjoy?
 
-**Next test:** freeze a leakage-safe task and fit the same architecture family at several model/data budgets with repeated seeds. Plot held-out improvement against event count, parameter count, and compute. Scale only where the target outcome improves; training-loss improvement alone would not support the thesis.
+## Before continuing
 
-## Evaluation and listening
-
-**Implemented:** user-ID splits, random context/target construction, score metrics, and a qualitative comparison harness. **Historically reported:** offline/listening disagreement on April 22, 2026. **Proposed:** out-of-time evaluation, cold-song and held-out-listener slices, and a blinded listening protocol.
-
-The smallest credible audio-value test compares popularity/activity, collaborative behavior, pooled audio similarity, a linear predictor, metadata-only neural prediction, audio plus behavior, and audio plus behavior plus metadata under one task definition. A shuffled-audio control should preserve other features while breaking track/audio correspondence. These baselines are proposed, not supplied as completed code or measurements.
-
-Predeclare candidate construction, horizon, metric aggregation, calibration, and less-popular/cross-genre slices. Shuffling or fitting preprocessing across train/test boundaries can itself leak information. Pair offline outcomes with consented, blinded listening judgments; familiarity and satisfaction should be recorded separately. Measure both predictive improvement from audio and whether people actually enjoy the recommendations.
+Read [Components](COMPONENTS.md) for missing artifacts and preserved defects, [Data and rights](DATA_AND_RIGHTS.md) for collection and reuse boundaries, and [Provenance](../PROVENANCE.md) for what this snapshot contains. No application execution, model download, service access, or reproduction success is implied by this reading map.

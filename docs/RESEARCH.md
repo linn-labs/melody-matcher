@@ -1,4 +1,8 @@
-# The thesis, the attempts, and why we stopped
+# The thesis and why it is paused
+
+[Research history](HISTORY.md) · [Experiment index](EXPERIMENTS.md)
+
+Better recommendations should learn the connections that make music matter to a particular person, including connections that genre labels and ordinary descriptions miss. That is the constructive goal behind Melody Matcher.
 
 ## We haven't run out of good music
 
@@ -62,31 +66,13 @@ By July 13, the question had shifted from product design to proving the idea as 
 
 We're sharing the attempts and mistakes so someone with the data, access, or a better idea can take this further.
 
-## The engineering trail
+## Follow the learning history
 
-The account below follows the design decisions, historical reports, and remaining experiments. Original data, trained weights, and trial logs aren't included; the experiments weren't rerun for this release.
+The research changed direction several times: a single taste vector gave way to candidate scoring; a promising validation result failed the listening test; a sampling diagnosis led to revised snowball cohorts; the limits of positive-only targets brought negatives back; and the later discussion questioned the target and scale of the entire test.
 
-## How the approach took shape
+**[Read the chronological account](HISTORY.md)** for the actual chain of beliefs, attempts, observations, and pivots. It preserves mistakes in our reasoning without turning every historical diagnosis into a proven cause. The [experiment index](EXPERIMENTS.md) links each stage directly to its detailed explanation.
 
-### Early plan and March: obtain behavioral evidence and usable audio
-
-We started with a fairly practical plan: pair a pretrained audio representation with Last.fm track counts, then train a two-tower model that summarizes a listener into one vector for retrieval. Counts were something we could actually collect without asking people to sit down and score their entire music library. They gave us a starting signal. The question was how much of taste that signal really captured.
-
-We considered MERT, CLAP, OpenL3, and Jukebox, and chose MERT as the starting representation because it was music-focused and manageable to work with. Training our own audio encoder first would have made an already difficult project much harder. The extractor still uses MERT; its actual dimensions are listed below, correcting some early notes.
-
-The **March 3, 2026 checkpoint** described discovery aimed at listeners with broad tastes, followed by aggregate top-track collection and diversity filtering. The intention was to expose the model to connections across musical categories. The same record reported uneven discovery yield and a strong skew toward active listeners with deep histories. It recorded a decision to proceed with the collected pool rather than immediately repeat failed discovery attempts, pending the diversity results. Coverage was already a research constraint, not just a count of collected users.
-
-The **March 5 checkpoint** separated two questions: durable taste from unordered libraries, and next-song context from chronological events. It described Deezer preview matching and timestamped collection infrastructure. The **March 24 checkpoint** then reported that saved preview URLs had expired before embedding extraction; matching and extraction were consolidated so previews could be resolved near use. Resolving previews near use fixed that acquisition problem. Current collection requirements are covered in [Data and rights](DATA_AND_RIGHTS.md).
-
-### April design: score each candidate against the library
-
-By the **April 7 principles and April 9 scoring design**, we had rejected the single-vector starting point. A crude average of Aretha and HARDY loses the different ways each song appeals to the same listener. We also considered a prototype with learned dimension weights, but that still asked one point and one weighting to do too much. We chose to keep the library and let each candidate look for the parts relevant to it. A learned pooled representation remains a useful comparison.
-
-We also had to decide how to tell the model that one song matters more to a listener than another. Just stick the score onto the audio vector? Multiply the whole vector by it? The April 9 design chose FiLM: let the score change how different dimensions are used, rather than turning the entire representation up or down uniformly. A separate attention bias gives higher-scored context songs more influence. Both mechanisms are in the code. Comparing them with the simpler options would test whether the extra complexity helps.
-
-Within-library regression made a first task possible: reveal part of a library and predict transformed play counts for the remainder. The design preferred log normalization to compress large count differences while preserving ordering. It considered alternatives because old songs, background listening, and listener activity complicate count interpretation. The retained preprocessing and dataset-variant code implements several transforms and filters. The April 9 design also proposed per-listener linear regression as a cheaper way to test whether simple feature weights carried signal. That baseline was never completed.
-
-We initially rejected sampled negatives because an absent song isn't a disliked song. It might be tomorrow's discovery that gets played fifty times. We hoped that learning relative preferences among known songs would carry over to unfamiliar ones. Applying the scorer to the wider catalog eventually forced us to confront how big a leap that was.
+The sections below describe the retained implementation, not a claim that every historical trial used precisely this final source.
 
 ## Implemented architecture
 
@@ -114,46 +100,10 @@ The existing hurdle objective uses binary cross-entropy for prepared-library mem
 
 [Training metrics](../library/scripts/train.py) compute Spearman and AUC after concatenating up to the last ten training batches; validation/test concatenate all loader batches. Spearman uses only nonpadding positive targets, while AUC contrasts nonpadding positive and sampled-negative targets. For hurdle models, ranking metrics use `sigmoid(play_logits)`, not the regression head. Pooled Spearman is not mean per-listener correlation. NDCG is computed over constructed target sets. These are not a catalog-wide temporal discovery benchmark. Varying target transforms, cohort membership, negative ratios, and random windows can alter metric meaning and difficulty. A fixed training recipe alone does not make those comparisons causal.
 
-## Historically reported result and failure
+## What remains unresolved
 
-After the training sweep, we needed to actually listen to what this thing recommended. Predicting held-out scores wasn't the same as finding music somebody wanted to hear. The April 22 harness let us import a library, compare models, and listen. Without that step we could have kept celebrating a number.
+The April 22 checkpoint reported an 18-trial sweep and best validation Spearman of 0.719, followed by recommendations that sounded bad: a narrow cluster of slow instrumental/background music that did not match the listener. The [history of that test](HISTORY.md#4-april-22-the-number-looked-promising-the-music-was-bad) explains why it changed the direction of the work. The original result artifacts are absent; no experiments were rerun for this snapshot.
 
-A development checkpoint dated **April 22, 2026** reported an 18-trial sweep, with best validation Spearman **0.719** for a longer-training trial. It also reported a listening inspection in which the top recommendations were unfamiliar and strongly clustered in a narrow, slow instrumental/background style, and were judged unsatisfactory.
+Training-distribution collapse was the working diagnosis, not an established cause. Counts can reward exposure and habit; positive-only regression can extrapolate poorly; sampled negatives can invent rejection; matching and representation can lose important information; capacity, optimization, implementation defects, and inference caching can also matter. The subsequent [sampling changes](SAMPLING.md) and [target experiments](TRAINING_EXPERIMENTS.md) address different parts of this problem. No supplied result ledger identifies a winning remedy.
 
-The checkpoint is the source for those results. Trial logs, evaluated weights, exact data/splits, recommendation lists, and listening judgments are absent. The code has changed since then, including the addition of hurdle heads, so this source snapshot does not reproduce that run.
-
-The recommendations were bad. That's the part worth remembering alongside the number. Unfamiliar songs were the point, so not recognizing them wasn't the failure; listening to a narrow cluster of songs that didn't hit was. Our offline task had let us make progress on something that wasn't yet the experience we wanted.
-
-## Competing interpretations
-
-The April interpretation was **training-distribution collapse**: a narrow supervised signal could reward one audio region regardless of context. No controlled comparison establishes that as the cause. Other explanations remain plausible:
-
-- Aggregate counts conflate exposure, availability, activity, habit, and preference; the objective may reward the wrong behavior.
-- Within-library regression may extrapolate poorly to catalog discovery, while sampled negatives can introduce false negatives and sampling-prior effects.
-- Coverage and fuzzy matching may distort the audio or library evidence presented to the model.
-- Representation choice, optimization, capacity, implementation defects, or inference caching may affect results.
-- Offline evaluation may reward correlations that do not improve listening satisfaction.
-
-The dataset and negative-sampling scripts implement several of those comparisons. Their outcomes remain unresolved; the proposed linear baseline is still missing.
-
-## After the listening mismatch: change the sample, or change the task?
-
-The **April 22 retraining plan** prioritized changing the training distribution. Its reasoning was that catalog overlap did not establish useful supervision: finding familiar tracks in the embedding catalog did not show that training examples taught the model when to score related candidates highly. It considered inference-time filtering, reweighting existing examples, and collecting a more relevant cohort. The plan favored new collection, with reweighting as an intermediate diagnostic. This pursued the sampling diagnosis above; capacity, objective, and implementation problems remained open.
-
-The **April 27 snowball plan** recorded a further decision, informed by a spot check: replace one uniform overlap filter with multiple tagged cohorts. The record argued that a popularity cap could exclude relevant musical regions and that modest overlap with a diverse library did not itself guarantee a broadly similar listener. It proposed stricter breadth-oriented overlap, looser region-filling collection, friend expansion, and long-tail seeds. Tagging cohorts would allow later training subsets to test different sampling theories without repeating collection. The plan records acceptance of that upfront collection tradeoff. The snowball and dataset-variant code implements these mechanisms. Which cohort helped, and whether stricter overlap actually encouraged breadth, remain open questions.
-
-A **later negative-sampling and hurdle plan**, whose body has no reliable experiment date, revisited the April rejection of negatives. It diagnosed a different gap: the scorer had only seen targets already belonging to a listener's library. It proposed a fixed dataset and backbone, varying the number of random catalog targets to isolate the loss/target change. The hurdle variant separated membership discrimination from positive-score regression, intended to avoid a single MSE objective being dominated by many zero targets. Those variants are implemented; the sweep results are absent. Their labels still distinguish prepared-library membership from sampled absence, so the original concern about mistaking unheard songs for disliked songs remains.
-
-These threads identify different uncertainties. Broader coverage might improve the available evidence; targeted cohorts might increase relevant supervision; new losses might change what the scorer learns to distinguish. None alone resolves whether the evaluation target captures satisfying discovery. The negative-sampling concern did not disappear when negatives were implemented: it became a tradeoff to measure. [Experiments](EXPERIMENTS.md) separates those mechanisms and proposes comparisons that could distinguish them.
-
-## May and July: scale the thesis, first define the proof
-
-The **May 20, 2026** discussion asked how bad an LLM would be with the equivalent of our model size and amount of data. Would it even make intelligible sentences? If not, how much should we conclude from this small music model being bad? Another recurring question was order: arbitrarily rearranging an aggregate library shouldn't change someone's taste. The order they actually listened to songs might tell us something different. That discussion sharpened the reasoning around scale and unordered attention; the April architecture was already in place.
-
-Mo's **July 13 note** made the connection explicit: "You don't need to teach it the rules of grammar or the differences in languages, the NN will figure that out. So why wouldn't that be true for music?" Enough clean data, a simple but effective architecture, attention, and enough parameters to learn the connections. That motivated trying raw behavior and metadata instead of deciding what a play count should mean before the model saw it. The obstacle was getting enough correct data for a serious test.
-
-**Marty's response was to suggest a narrower first test:** once we know someone has encountered a song, predict whether they come back and how much they replay it. That gets rid of the worst ambiguity around a song they've never heard. He proposed keeping count, recency, and metadata as explicit inputs and predicting future behavior from past information only. That experiment remains a proposal.
-
-That proposal is different from the existing membership/score hurdle target. It requires an explicit time horizon, exposure definition, censoring policy, and time-correct features. A first observed play reduces exposure ambiguity but may not be the listener's true first encounter. Repeat behavior also remains affected by playlist placement and habit. Success on return prediction would support a narrower claim than discovery of never-before-played music.
-
-Marty also proposed temporal holdouts, strong behavioral baselines, shuffled-audio controls, and a model/data scaling ladder. Those would help us find out whether the model was really learning from the music and whether more data and capacity were helping. [Experiments](EXPERIMENTS.md) lays out those tests for whoever picks this up next.
+Moritz's July reset proposed learning from actual behavior and metadata instead of deciding beforehand what every count should mean. Marty's response proposed predicting return and replay after an observed encounter. That [possible next proof](FUTURE_PROOF.md) is distinct from the current hurdle implementation and remains unadopted and unexecuted.

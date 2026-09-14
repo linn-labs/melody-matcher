@@ -1,6 +1,6 @@
 # Melody Matcher
 
-Spotify and Apple Music recommendations suck. I keep discovering songs I absolutely love that have been sitting there for decades. They didn't need to be written. They needed to be recommended to me.
+Music recommendations should help us discover songs we love for reasons we can't quite explain. Melody Matcher is an attempt to learn those reasons from the music itself and people's listening behavior.
 
 I love both HARDY's "Favorite Country Song" and Aretha Franklin's "Don't Play That Song," without being able to explain what connects them. That's the music's **DNA**: something the brain hears that a genre label or a "danceability" score fails to describe.
 
@@ -14,10 +14,16 @@ If this works, the same principle can extend to books, movies, maybe even clothe
 
 The source uses audio embeddings and candidate-conditioned attention over a listener's library. The docs cover the historical trials, limitations, and possible next experiments. This is unfinished research; the experiments weren't rerun for this release.
 
+*In these docs, ‘I’ is Moritz Linn; ‘we’ means Moritz and his AI collaborators. Marty is Moritz's custom AI agent built on [Hermes](https://github.com/NousResearch/hermes-agent), one of those collaborators.*
+
 ## Read the research
 
-- [Research](docs/RESEARCH.md): hypothesis evolution, actual architecture, historical observations, competing explanations.
-- [Experiments](docs/EXPERIMENTS.md): implemented avenues and proposed tests that could distinguish those explanations.
+- [The thesis](docs/RESEARCH.md): music DNA, what better recommendations would make possible, and why the project is paused.
+- **[The research history](docs/HISTORY.md): what we believed → what we built and tried → what happened → what we realized → what changed next. Start here to learn from the attempts.**
+- [Experiment index](docs/EXPERIMENTS.md): the chronological route into detailed sampling, training, and future-test explanations.
+- [How the snowball works](docs/SAMPLING.md): why the collection plan changed, exactly what overlap means, and what each cohort was meant to test.
+- [Training experiments](docs/TRAINING_EXPERIMENTS.md): the original regression task, all dataset-variant families, negative sampling, hurdle heads, and evaluation limitations.
+- [A possible next proof](docs/FUTURE_PROOF.md): the later exposure/return proposal, not an implemented experiment.
 - [Components](docs/COMPONENTS.md): source navigation, expected schemas and artifacts, preexisting defects, and reader hazards.
 - [Data and rights](docs/DATA_AND_RIGHTS.md): privacy and external model, music, and service restrictions.
 - [Provenance](PROVENANCE.md): what this curated snapshot includes and excludes.
