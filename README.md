@@ -1,12 +1,16 @@
 # Melody Matcher
 
-Can a model learn which aspects of a song matter to a listener from audio representations and listening behavior? Melody Matcher explores that question with candidate-conditioned attention over a listener's music library.
+I think Spotify and Apple Music recommendations are pretty shit. I keep discovering songs I absolutely love that have been sitting there for decades. They didn't need to be written. They needed to be recommended to me.
 
-The motivating frustration is a recommendation that resembles something you play but misses what makes it matter to you. Songs can connect personally across very different styles. Our thesis is that sufficiently capable models could learn those listener- and candidate-specific connections from audio and scalable listening evidence, without people first defining the relevant musical rules. Broad categories, one global similarity measure, and co-listening patterns each leave parts of that question open; this is a research motivation, not evidence that modern systems ignore audio or that this approach is superior.
+I don't know why I love both HARDY's "Favorite Country Song" and Aretha Franklin's "Don't Play That Song," but I'm pretty confident there's something in the music's **DNA** that explains it. Not a genre label. Not a "danceability" score. Something my brain hears even when I can't put it into words.
 
-**This is unfinished, paused research, not a working or supported recommender.** The source is shared to make the approach, experiments, and unresolved questions understandable. Recommendation quality has not been validated. No installation, training run, harness session, or benchmark was reproduced for this snapshot.
+A friend who knows your taste can hear a song and think, *you need to hear this*. They've built a mental model of what hits for you. I believe we can train a neural network to learn those connections from the music itself and the music people actually return to, without first teaching it our vocabulary for describing songs. That's the bet behind Melody Matcher.
 
-The most instructive historical observation is a mismatch: an April 2026 record reported validation Spearman of 0.719, while listening inspection found narrowly clustered, unsatisfactory recommendations. That metric is an unverified historical report, and the cause of the failure remains unresolved. See [Research](docs/RESEARCH.md).
+The ambition goes beyond another playlist. Sometimes I'm obsessed with one song and want something that scratches the same itch before I play it to death. Sometimes I want a song from somewhere I'd never have thought to look. A good model of musical DNA should let us explore both. [The thesis and the reasoning](docs/RESEARCH.md) explain what I mean, what we tried, and where we got stuck.
+
+**The thesis is alive. The project is paused, and the recommender doesn't work well.** Our current suspicion is that we don't have the right listening data, or enough of it, to train the model properly. Making the network bigger without solving that doesn't get us anywhere. We're sharing the source and thinking so somebody else can work from them, not because we're pretending to have solved music discovery.
+
+This is an opinionated research project, not a supported product. The source uses audio embeddings and candidate-conditioned attention over a listener's library. The historical trials, limitations, and possible next experiments are documented below; no new benchmark or runtime validation was performed for this release.
 
 ## Read the research
 

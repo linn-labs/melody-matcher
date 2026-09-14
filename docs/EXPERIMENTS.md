@@ -40,6 +40,8 @@
 
 ## Model and data scale
 
+This is the main reason the project is paused: we suspect the downstream model is too large for the user evidence we have, while the larger version of the thesis needs far more and better data than we can currently obtain. Shrinking the model is a useful diagnostic; scaling parameters without scaling the evidence is not the experiment we want. This is our current hypothesis, not a completed model-size comparison. [The research account](RESEARCH.md) explains how we got here.
+
 **Implemented:** [hyperparameter sweep definitions](../library/scripts/hyperparam_sweep.py) vary optimization and architecture, including hidden width and depth. **Historically reported:** the April checkpoint reported an 18-trial sweep and a 0.719 best validation Spearman. It supplies no controlled scaling law, and the current sweep has a preserved return-value mismatch described in [Components](COMPONENTS.md).
 
 **Confounds:** data quality, label definition, training compute, optimization, and evaluation difficulty can dominate apparent size effects. The selected external MERT encoder's 330M designation is not the size of the downstream taste model.

@@ -1,26 +1,70 @@
-# Research
+# The thesis, the attempts, and why we stopped
 
-This account separates **implemented behavior** established by static source reading, **historically reported observations**, **interpretation**, and **proposals**. Source presence is not evidence that an experiment completed successfully. The snapshot includes neither the original data nor the artifacts needed to reproduce its historical results.
+*The "I" in this account is Mo, the person whose frustration started the project. "We" includes the work with AI collaborators. Marty helped write this account from those conversations and the project records.*
 
-## The listener problem and the thesis
+## I don't think we've run out of good music
 
-Mo's starting point was dissatisfaction with recommendations that missed personally meaningful connections between otherwise dissimilar songs. The desired discovery was a song that felt right for a particular listener even when its genre, instrumentation, or overall sound differed from familiar favorites. The research question is what evidence a model would need to learn that relationship.
+I think Spotify and Apple Music recommendations suck. Not because every song should be a banger, but because I keep finding songs I'm absolutely in love with that were released years, sometimes decades, ago. They existed the whole time. I just never got pointed toward them.
 
-Broad categories can describe a collection without explaining which songs within it resonate. A single global audio-distance rule can emphasize similarities that matter little to one listener and overlook those that matter greatly. Co-listening can reveal useful associations, but observed plays also reflect what people encountered and had opportunities to replay. These are limitations to investigate when relying on those signals, not a description of undocumented commercial internals. Modern recommenders can combine behavioral, audio, and other signals; the project's dissatisfaction is neither an industry-wide evaluation nor a novelty or superiority result.
+That's why I have such a problem with "there's only so much music out there." Sure. But I haven't found all the music I love. Every old song I discover and obsess over is a very concrete example of something the recommendation system missed. It doesn't tell us exactly how to build a better system. It does tell me there's a lot left to find, and I don't buy that we've hit the ceiling.
 
-The thesis is ambitious: let a sufficiently capable model learn musical relationships from audio and scalable behavioral evidence rather than require a human vocabulary of musical rules. A candidate should be able to draw on different parts of the same listener's history. Attention interested the project because it offers that flexibility; scale interested Mo because a small model on sparse evidence might never have enough capacity or examples to discover the relationships being sought.
+My complaint is that recommendations so often feel like souped-up nearest-neighbor search: you like this sort of thing, here's something else in the same neighborhood. I suspect we're using the wrong map. "Danceability," energy, genre, and who else played a song are thin descriptions of why a particular piece of music gets under someone's skin. The failure I care about is a system that knows the neighborhood but keeps missing the house.
 
-The **dimensional-selectivity hypothesis**, made explicit in the April design records, is that preference depends on different aspects or combinations of audio features for different listeners and candidates. This is a hypothesis about learnable structure, not a claim that particular embedding coordinates have established musical meanings. Attention weights are not causal explanations, and an expressive mechanism does not prove that the intended relationship was learned.
+I don't have Spotify's or Apple's production architecture in front of me. "Souped-up nearest neighbors" is my diagnosis of the experience and the approach I want to get beyond, not a claim that their entire stack is one algorithm or that neither uses learned audio representations. The objection is to what the system understands about music and the listener, not to the existence of a nearest-neighbor lookup somewhere in the pipeline. Better search through the wrong representation still gets you the wrong songs faster.
 
-Human choices remain throughout: artist seeds, genre/tag mappings, diversity thresholds, overlap gates, track filtering, target transforms, and architecture. The scorer does not directly apply genre rules, but the overall research pipeline is not assumption-free. The history below shows how attempts to make the thesis testable introduced assumptions of their own.
+## Music DNA
+
+I love both HARDY's "Favorite Country Song" and Aretha Franklin's "Don't Play That Song." I can't give you a clean explanation for why. Country and soul don't get me very far, and putting those labels next to each other doesn't explain the connection either.
+
+But I don't think my taste is random. I think there's something in the music's DNA that explains why both hit for me. It might be in a voice, a bit of tension, the way a phrase lands, or a combination of things I don't have words for. I don't want to decide in advance which of those explanations is right. The whole idea is to let the model find connections our descriptions miss.
+
+Think about recommending music to a friend you know well. Sometimes you hear a song and immediately know: *they're going to love this*. You aren't calculating its danceability. You've built a representation of that person's taste from all the music you've heard them love, and you have a representation of the new song even if you're hopeless at explaining either one. Our internal neural network does something I want the artificial one to learn. That analogy is where my conviction comes from; it's not a neuroscience result.
+
+By "DNA" I mean that underlying musical information, not a literal genetic code or a list of universal taste coordinates. We tried representing it with audio embeddings. Whether our chosen embeddings preserve enough of it is one of the questions the work has to answer. A vector is a container, not a guarantee that you've put the right thing inside it.
+
+I believe a sufficiently capable model, trained on enough of the right listening behavior and rich enough representations of the music, can learn why apparently unrelated songs belong together for a particular person. We shouldn't have to teach it a set of genre rules or explain in words what makes a song hit. We should give it the evidence and the tools to make those connections.
+
+This is the accumulation of work to test the thesis of a very opinionated 25-year-old. I can be wrong, and some of my ideas will be dumb. That doesn't mean I need to preface every idea with an apology. I think the thesis is right. We haven't made it work yet.
+
+## More of this feeling, without playing the song to death
+
+There's more to this than recommending a random song I might enjoy.
+
+Sometimes I'm completely obsessed with one song. I want to keep getting whatever it gives me, but I don't want to listen to it so much that I ruin it for myself. What I'd like to ask is: *find me something else that scratches this particular itch*.
+
+That should mean something closer in the parts of musical DNA that matter to me right now, not just another track with high danceability. In a learned space that actually captures that relationship, I should be able to stay close to the song I'm obsessed with or reach further out while still finding something I'll love. Those are different kinds of discovery, and both are interesting.
+
+This also explains why I can criticize nearest-neighbor recommendations and still talk about closeness in vector space. Distance is only meaningful after you've learned what should count as close, for whom, and in relation to which song. I want the relationship learned from the music and the listener, rather than declared by a handful of descriptors.
+
+The April design already suggested emphasizing one context song's score as a way to ask for "more like this." That's a starting idea, not a working control we can hand you. The current candidate scorer doesn't expose a proven music-DNA distance or an obsession slider. It's an attempt to learn some of the relationship we'd need first.
+
+## Why it's paused
+
+We didn't pause because I stopped caring about the idea. I still run into the problem every time I discover an old song I should have heard years ago. We paused because we couldn't see a convincing route to the data needed to test it properly.
+
+Our latest working hypothesis is mainly a data problem: we don't have the right user listening data, or enough of it, and the downstream network may already be too big for the evidence we can feed it. That's different from saying it's too capable for the problem. It can be too big for our dataset and still be nowhere near the scale needed to learn what we're asking it to learn.
+
+The temptation is to make the model bigger. I share that temptation. But we can't scale the NN meaningfully without scaling the data, and we don't currently have a way to get the quality and volume we'd need. Access to listening behavior and usable song recordings, not another architecture diagram, is the constraint. A smaller model would still be a useful comparison; it wouldn't magically supply the missing evidence.
+
+The problem kept turning up in different forms. Who did we collect? Which of their songs could we represent? Did lots of plays mean love, years of playlist placement, or simply more opportunities to hear the track? Was an absent song unwanted or just undiscovered? Was the model learning taste, or learning the shape of the sample we'd assembled? Changing the loss doesn't settle those questions, and collecting more of the same biased signal may just teach it the wrong thing more confidently.
+
+That's our current explanation for why the work is stuck, not a measured verdict that model size caused the failure. The earlier records leaned hard toward a sampling diagnosis. The later conversations broadened the concern to the data/model balance and what we were even training the model to predict. We haven't run the controlled comparisons that would settle those competing explanations.
+
+By July 13, I'd stepped back from the imagined product: forget whether someone imports a whole library, selects a few songs, or finds the interface convenient. What's the fastest path to proving the idea? The inputs still have to scale. Asking everyone to rate every song from one to ten isn't that path. I wanted to try audio embeddings and actual plays, add metadata where useful, and let the model learn what mattered instead of handing it a preference score we'd invented first.
+
+I still want that experiment to happen. Releasing the work is a way of making our attempts and mistakes useful to somebody who might have the data, access, or better idea that we don't.
+
+## What the records can tell you
+
+The rest is the engineering trail: what we built, what the dated records say happened, and why we changed direction. The original data, trained weights, and trial logs aren't included, and we haven't rerun the experiments for this release. I'll keep the distinction between a result and a hunch where it matters. The thesis doesn't need a disclaimer after every sentence.
 
 ## How the approach took shape
 
 ### Early plan and March: obtain behavioral evidence and usable audio
 
-The initial plan paired a pretrained audio representation with Last.fm track counts, then proposed a two-tower model that would summarize a listener into one vector for nearest-neighbor retrieval. Its rationale for counts was practical: track-level listening records offered repeated behavioral evidence without asking every listener to rate every song. Counts were treated as a starting proxy for preference, not a direct observation of why a song mattered.
+We started with a fairly practical plan: pair a pretrained audio representation with Last.fm track counts, then train a two-tower model that summarizes a listener into one vector for retrieval. Counts were something we could actually collect without asking people to sit down and score their entire music library. They gave us a starting signal. The question was how much of taste that signal really captured.
 
-That plan considered MERT, CLAP, OpenL3, and Jukebox representations and recommended starting with MERT for its music-specific focus and a tractable representation size. This was a design judgment, not a project comparison demonstrating that MERT best captured personal taste. The retained extractor uses MERT; the exact dimensions below supersede stale numbers in the early plan. Using a pretrained representation made the downstream taste question approachable without first training an audio encoder, while leaving open whether its features retained the information the task needed.
+We considered MERT, CLAP, OpenL3, and Jukebox, and chose MERT as the starting representation because it was music-focused and manageable to work with. Training our own audio encoder first would have made an already difficult project much harder. We didn't run a comparison proving MERT was the best choice; we picked a plausible starting point. The extractor still uses it. Its actual dimensions are listed below, since some early notes got those wrong.
 
 The **March 3, 2026 checkpoint** described discovery aimed at listeners with broad tastes, followed by aggregate top-track collection and diversity filtering. The intention was to expose the model to connections across musical categories. The same record reported uneven discovery yield and a strong skew toward active listeners with deep histories. It recorded a decision to proceed with the collected pool rather than immediately repeat failed discovery attempts, pending the diversity results. Coverage was already a research constraint, not just a count of collected users.
 
@@ -28,13 +72,13 @@ The **March 5 checkpoint** separated two questions: durable taste from unordered
 
 ### April design: score each candidate against the library
 
-The **April 7 principles and April 9 scoring design** moved away from the initial single-vector framing. The stated concern was that averaging a diverse library into one point, even with one set of dimension weights, could obscure multiple ways in which songs appeal to the same person. The chosen design kept a library of representations and let each candidate attend to it. This is a documented architectural rationale, not a measured defeat of all pooled-vector or two-tower alternatives.
+By the **April 7 principles and April 9 scoring design**, we had rejected the single-vector starting point. A crude average of Aretha and HARDY isn't what I want to listen to. More generally, one center of gravity seemed like the wrong way to represent all the different ways music can appeal to one person. We also considered a prototype with learned dimension weights, but that still asked one point and one weighting to do too much. We chose to keep the library and let each candidate look for the parts relevant to it. That was our architectural bet; a strong learned pooled representation still deserves a proper comparison.
 
-The April 9 design also explained why scores entered through FiLM and an attention bias. A play-derived score describes a listener's relationship to a track, so it was intended to control how the audio representation was used. Concatenation was considered; uniform multiplication was considered too. FiLM offered learned scale and shift by dimension, while the separate attention bias increased the influence of higher-scored context tracks. Both mechanisms are present in the retained code. Their benefit over simpler conditioning remains unestablished without ablations.
+We also had to decide how to tell the model that one song matters more to a listener than another. Just stick the score onto the audio vector? Multiply the whole vector by it? The April 9 design chose FiLM: let the score change how different dimensions are used, rather than turning the entire representation up or down uniformly. A separate attention bias gives higher-scored context songs more influence. Both mechanisms are in the code. Whether they earn their complexity over the simpler options is still an experiment worth doing.
 
 Within-library regression made a first task possible: reveal part of a library and predict transformed play counts for the remainder. The design preferred log normalization to compress large count differences while preserving ordering. It considered alternatives because old songs, background listening, and listener activity complicate count interpretation. The retained preprocessing and dataset-variant code implements several transforms and filters; their presence does not establish a winning target. An April 9 per-listener linear-regression baseline was also proposed as a cheaper probe of whether simple feature weights carried signal. It remained a proposal, not a completed comparison or proof that nonlinear attention was necessary.
 
-The same scoring design initially rejected sampled negatives: a song absent from a library might simply be unheard. It hoped relative scores among known tracks would be enough for ranking. That choice avoided labeling unknown songs as dislikes, but left an unanswered extrapolation question when the trained scorer was applied to the wider catalog.
+We initially rejected sampled negatives for a reason I still think matters: if a song isn't in my library, you don't know that I dislike it. I might be about to discover it and play it fifty times. We hoped that learning relative preferences among known songs would carry over to unfamiliar ones. Applying the scorer to the wider catalog eventually forced us to confront how big a leap that was.
 
 ## Implemented architecture
 
@@ -64,13 +108,13 @@ The existing hurdle objective uses binary cross-entropy for prepared-library mem
 
 ## Historically reported result and failure
 
-The April 22 record explains why a listening harness was added after the training sweep: predicting held-out scores did not answer whether the model's actual catalog recommendations were useful. Import, comparison, and feedback were intended to connect the offline task to that experience.
+After the training sweep, we needed to actually listen to what this thing recommended. Predicting held-out scores wasn't the same as finding music somebody wanted to hear. The April 22 harness let us import a library, compare models, and listen. Without that step we could have kept celebrating a number.
 
 A development checkpoint dated **April 22, 2026** reported an 18-trial sweep, with best validation Spearman **0.719** for a longer-training trial. It also reported a listening inspection in which the top recommendations were unfamiliar and strongly clustered in a narrow, slow instrumental/background style, and were judged unsatisfactory.
 
 This is a dated historical report, not an independently verified benchmark or a reproducible listening study. Trial logs, evaluated checkpoints, exact data/splits, recommendation lists, and listening judgments are not distributed. The current source has evolved since that report, including hurdle-related changes; its presence cannot recreate the historical execution state. The report's claims of a working harness and a settled diagnosis are not adopted as current guarantees.
 
-The useful observation is the reported disagreement between an offline score and the listening experience. Unfamiliarity alone would not prove failure at discovery, but the reported dissatisfaction and narrow clustering motivate evaluation beyond that score. The single inspection does not establish population-wide recommendation quality.
+The recommendations were bad. That's the part worth remembering alongside the number. Unfamiliar songs were the point, so not recognizing them wasn't the failure; listening to a narrow cluster of songs that didn't hit was. Our offline task had let us make progress on something that wasn't yet the experience we wanted.
 
 ## Competing interpretations
 
@@ -96,12 +140,12 @@ These threads identify different uncertainties. Broader coverage might improve t
 
 ## May and July: scale the thesis, first define the proof
 
-On **May 20, 2026**, Mo questioned whether a model at the project's data and parameter scale could meaningfully test the thesis. His analogy was an extremely small language model: weak output might reflect insufficient capacity and evidence rather than the absence of learnable structure. He also argued that arbitrary track order should not matter for aggregate play-count modeling, while real event order could matter for listening-history questions. This explains the interest in attention without arbitrary ordering effects; it does not establish that the May discussion caused the already documented April architecture. The retained set-like model and chronological collector remain distinct.
+On **May 20, 2026**, I was asking how bad an LLM would be if it had the equivalent of our model size and amount of data. Would it even make intelligible sentences? If not, how much should we conclude from this small music model being bad? I also kept coming back to order: the arbitrary order of songs in an aggregate library shouldn't change someone's taste. The order they actually listened to songs might tell us something different. That discussion sharpened the reasoning around scale and unordered attention; the April architecture was already in place.
 
-In his **July 13 note**, Mo returned to the fastest way to prove the originating idea, setting aside product choices such as library import versus individual song selection. Scalable inputs remained central: explicit song ratings would require manual judgment at a scale the project could not assume. He proposed treating embeddings and observed counts as evidence, trying song/user metadata as additional inputs, and letting a capable model learn what mattered instead of first converting behavior into one preference score. Enough clean data and enough model capacity were his concern. The language-model analogy motivates testing scale; it does not show that more compute will recover missing exposure information or solve recommendation.
+In my **July 13 note**, I put it this way: "You don't need to teach it the rules of grammar or the differences in languages, the NN will figure that out. So why wouldn't that be true for music?" I wanted enough clean data, a simple but effective architecture, attention, and enough parameters to make the connections. That was why I wanted to try raw behavior and metadata rather than deciding what a play count should mean before the model ever saw it. The obstacle was getting enough correct data to make that a serious test. Bigger models can't tell us about listening opportunities we never recorded just because we wish they could.
 
-**Marty's July 13 synthesis proposed a narrower operationalization:** after an observed exposure, predict whether a listener returns within a future window and how intensely they replay the song if they return. This return/count benchmark was Marty's proposal in response to Mo's thesis and raw-behavior thinking, not an adopted decision or an executed experiment. It would use only pre-cutoff behavior and information available then, with count, recency, and metadata kept explicit rather than collapsed into a handcrafted score.
+**Marty's response was to suggest a narrower first test:** once we know someone has encountered a song, predict whether they come back and how much they replay it. That gets rid of the worst ambiguity around a song they've never heard. He proposed keeping count, recency, and metadata as explicit inputs and predicting future behavior from past information only. We haven't adopted or run that experiment; it's one possible way to test the thesis without pretending to have solved all of discovery at once.
 
 That proposal is different from the existing membership/score hurdle target. It requires an explicit time horizon, exposure definition, censoring policy, and time-correct features. A first observed play reduces exposure ambiguity but may not be the listener's true first encounter. Repeat behavior also remains affected by playlist placement and habit. Success on return prediction would support a narrower claim than discovery of never-before-played music.
 
-Marty's proposed temporal holdouts, strong behavioral baselines, shuffled-audio controls, and model/data scaling ladder would ask whether audio adds predictive information and whether more capacity and evidence improve that result. They are not completed benchmarks or an accepted development roadmap. [Experiments](EXPERIMENTS.md) turns these open questions into small distinguishing tests. The unresolved ambition remains Mo's: learn personally meaningful musical connections without having to specify those connections in advance.
+Marty also proposed temporal holdouts, strong behavioral baselines, shuffled-audio controls, and a model/data scaling ladder. Those would help us find out whether the model was really learning from the music and whether more data and capacity were helping. [Experiments](EXPERIMENTS.md) lays out those possible tests, not a promised development roadmap. I'm putting them here because someone picking this up should get the questions as well as the code. I still think there's something worth finding in this.
