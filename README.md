@@ -8,6 +8,8 @@ A friend who knows your taste can hear a song and think, *you need to hear this*
 
 The ambition goes beyond another playlist. Sometimes I'm obsessed with one song and want something that scratches the same itch before I play it to death. Sometimes I want a song from somewhere I'd never have thought to look. A good model of musical DNA should let us explore both. [The thesis and the reasoning](docs/RESEARCH.md) explain what I mean, what we tried, and where we got stuck.
 
+I also think the same logic could reach far beyond music: books, movies, maybe even clothes. Represent the thing richly, then train a large neural network to learn how people's preferences relate to it. Music is the first place we're trying to make that work, not the limit of the idea.
+
 **The thesis is alive. The project is paused, and the recommender doesn't work well.** Our current suspicion is that we don't have the right listening data, or enough of it, to train the model properly. Making the network bigger without solving that doesn't get us anywhere. We're sharing the source and thinking so somebody else can work from them, not because we're pretending to have solved music discovery.
 
 This is an opinionated research project, not a supported product. The source uses audio embeddings and candidate-conditioned attention over a listener's library. The historical trials, limitations, and possible next experiments are documented below; no new benchmark or runtime validation was performed for this release.

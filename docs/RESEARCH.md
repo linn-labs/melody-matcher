@@ -38,6 +38,16 @@ This also explains why I can criticize nearest-neighbor recommendations and stil
 
 The April design already suggested emphasizing one context song's score as a way to ask for "more like this." That's a starting idea, not a working control we can hand you. The current candidate scorer doesn't expose a proven music-DNA distance or an obsession slider. It's an attempt to learn some of the relationship we'd need first.
 
+## Music is the first test
+
+If we can make this work for music, I think the same logic could apply to nearly anything we'd want recommended to us. Books, movies, maybe even clothes. Represent the thing as a vector that captures something meaningful about it, then train a large neural network on people's preferences against those representations. Let it learn the connections instead of asking us to explain our taste first.
+
+Two books can leave you with the same feeling without sharing a genre or a plot. Two movies can have almost nothing in common in a catalog and still be exactly your kind of movie. With clothes, you can sometimes look at something and immediately know it's you, even if you'd never have thought to search for it. That's the kind of relationship I want a model to learn. The descriptions we use to sort things aren't the whole reason we love them.
+
+The representation and the evidence would change with the medium. A book gives us text; a film gives us images, dialogue, sound, and how they unfold together. Clothes bring in how something looks, feels, and fits. A purchase isn't automatically love, any more than a play is. We'd need to give each model the information that matters rather than assume that putting anything into a vector makes it useful.
+
+But I don't think there's a wall around music here. If the approach succeeds, I want to take the same bet elsewhere: rich representations of the things themselves, enough real evidence of people's preferences, and a network capable of learning the relationship between them. Music is where we're trying to earn that confidence. Books, movies, and clothes are the ambition beyond it, not experiments we've already run.
+
 ## Why it's paused
 
 We didn't pause because I stopped caring about the idea. I still run into the problem every time I discover an old song I should have heard years ago. We paused because we couldn't see a convincing route to the data needed to test it properly.
