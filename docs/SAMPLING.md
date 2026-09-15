@@ -77,7 +77,7 @@ The retained pipeline separates several operations:
 
 These are distinct populations. Discovered candidates are not all qualifying users; qualifying users do not imply all their tracks have usable embeddings; a tagged user is not necessarily retained by downstream preparation. Published analysis would need those denominators at each stage rather than one headline “dataset size.”
 
-Progress tables and per-seed records support resumability. They are operational state, not proof of complete or correct collection. Even a dry-run name is not a no-I/O guarantee: the script can resolve seeds through services and initialize storage before returning. [Components](COMPONENTS.md) lists the preserved hazards.
+The [component guide](COMPONENTS.md) separately covers operational behavior and execution hazards.
 
 ## Why store provenance instead of one final approved cohort?
 

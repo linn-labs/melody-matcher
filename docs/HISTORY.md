@@ -16,15 +16,15 @@ The undated initial plan chose Last.fm because it linked tracks and aggregate pl
 
 **What changed.** The collection pipeline became real, but the single-vector retrieval architecture did not remain the design. By April, we wanted candidates to attend to different parts of the same library instead of making one pooled point represent every kind of song someone could love. That was a design rejection, not a failed head-to-head training experiment. [Stage 3](#3-april-7-9-score-a-candidate-against-the-library) explains the replacement.
 
-The early plan used Spotify in its proposed acquisition flow; the March checkpoints describe Deezer. The preserved record establishes that change in provider, but not a sufficiently reliable causal account to claim a particular Spotify restriction forced it. Early statements that short previews were automatically legal to process are not a rights finding. See [Data and rights](DATA_AND_RIGHTS.md).
+The early plan used Spotify in its proposed acquisition flow. We moved away from it because Spotify's restrictions no longer allowed the kind of work we intended to do; by March, the pipeline used Deezer. Moritz confirmed that reason while reviewing this history, but no longer recalls the exact restriction. The provider change is part of the research history, not a finding that Deezer permitted every intended use. See [Data and rights](DATA_AND_RIGHTS.md).
 
 ## 2. March: a broad dataset was already a selected dataset
 
 **What we wanted.** Collect listeners whose tastes crossed categories, obtain their top tracks, and filter for broad listening. The hope was that these libraries would teach the network relationships that single-genre collections would not reveal.
 
-**What we tried.** The March 3 checkpoint describes artist-listener discovery, expansion through friends, aggregate top-track collection, and artist-tag-based diversity scoring. Discovery was not uniform: many artist pages returned errors, and friends lists were not always available. The record reports 5,732 collected users, fewer than originally sought, with a strong skew toward active listeners and deep histories. It records a decision to continue to diversity scoring before immediately repeating failed discovery.
+**What we tried.** Discover listeners through selected artists and their social connections, collect their top tracks, then use artist tags to favor varied listening histories. The resulting sample skewed toward active listeners with deep histories rather than representing listeners uniformly.
 
-**What we learned.** Having a lot of tracks was not the same as having a representative sample. The way we found people selected for activity; failed pages changed which starting artists contributed users. “Diverse” also meant passing our particular tag, concentration, and entropy rules. None of that established that the resulting supervision represented a new listener's taste.
+**What we learned.** Having a lot of tracks was not the same as having a representative sample. The way we found people selected for activity and made the starting artists influence whose taste was represented. “Diverse” also meant passing our particular tag, concentration, and entropy rules. None of that established that the resulting supervision represented a new listener's taste.
 
 **The next split in the plan.** By March 5, two methods had distinct purposes:
 
@@ -33,9 +33,7 @@ The early plan used Spotify in its proposed acquisition flow; the March checkpoi
 
 They could share track matching and audio embeddings, but they were different learning problems. Event collection infrastructure was written; the retained repository does not contain a sequential training model. Do not read the old aspiration to combine them as a completed combined recommender.
 
-**A concrete acquisition failure.** The March 24 checkpoint reports that preview URLs saved during matching had expired before extraction and returned HTTP 403. It also says the embedding file was still empty at that checkpoint. Earlier “pipeline complete” wording therefore meant infrastructure, not a completed embedding corpus. Matching and extraction were consolidated around storing the Deezer track ID and resolving a fresh preview URL near download time.
-
-This matters beyond the operational fix. A matched track is not necessarily an embedded track, and an embedded catalog is not necessarily a good training distribution. Those distinctions became central after the first listening test.
+**The research constraint.** Audio availability selected which collected songs could become training examples. A large catalog therefore did not establish either representative coverage or useful preference supervision. That distinction became central after the first listening test.
 
 Source: [discovery](../scripts/01_discover_users.py), [diversity scoring](../scripts/03_score_diversity.py), [match and embed](../scripts/04_match_and_embed.py), and [event collection](../sequential/README.md). The [component guide](COMPONENTS.md#collection-and-representations) explains their inputs and hazards without presenting them as approved collection instructions.
 
@@ -76,7 +74,7 @@ The reported recommendations clustered in slow instrumental/background music and
 
 The report prompted a shift from tuning the network to examining the training sample and supervised task. It did not identify a unique root cause. The evaluated weights, exact splits, trial logs, and recommendation lists are absent, and later source changes mean this snapshot is not a replay of that experiment.
 
-The retained [harness](../harness/README.md) is the inspection source, not a hosted demo. Its historical “Play” control opens an Apple Music search link; it does not implement in-app playback. The [metric definitions](RESEARCH.md#implemented-targets-and-evaluation) explain the current code's aggregation and target limitations.
+The retained [harness](../harness/README.md) is the inspection source, not a hosted demo. The [metric definitions](RESEARCH.md#implemented-targets-and-evaluation) explain the current code's aggregation and target limitations.
 
 ## 5. April 22: separate catalog coverage from useful supervision
 
@@ -111,9 +109,9 @@ Tagging users and storing overlap statistics would let later training experiment
 
 **A mistake worth retaining explicitly.** The plan called its strict overlap threshold a mathematical guarantee of breadth. The implementation does not provide that guarantee. Its denominator is the candidate's sampled tracks or artists, not the target library, and admission is track overlap **or** artist overlap. A specialist can therefore overlap strongly with one slice of the target and still pass. Raising the threshold strengthens alignment under that definition; it does not prove coverage across the target's taste regions. This is a retrospective reading of the code, not a claim that we measured the effect then.
 
-**The implemented dataset experiments.** The next source makes collection feed a set of comparisons: keep the original cohort, use snowball users, tighten overlap, favor diverse or engaged listeners, remove low-play tracks, change score transforms, or stack several of those choices. The script defines 17 variants, with an ordering intended to produce informative comparisons even if a run stopped early. [Training experiments](TRAINING_EXPERIMENTS.md#dataset-variants-what-each-change-was-meant-to-test) explains every family and variant.
+**The implemented dataset experiments.** The next source makes collection feed a set of comparisons: keep the original cohort, use snowball users, tighten overlap, favor diverse or engaged listeners, remove low-play tracks, change score transforms, or stack several of those choices. The script defines 17 variants to test those competing explanations. [Training experiments](TRAINING_EXPERIMENTS.md#dataset-variants-what-each-change-was-meant-to-test) explains every family and variant.
 
-The script's recipe is based on the earlier longer-training trial, with a larger batch and shorter early-stopping patience. Holding that recipe fixed was intended to isolate dataset differences. It does not make the resulting metrics directly causal or comparable: variants change users, targets, sample size, and task difficulty.
+Holding the training recipe fixed was intended to isolate dataset differences. It does not make the resulting metrics directly causal or comparable: variants change users, targets, sample size, and task difficulty.
 
 **What we can conclude.** The multi-cohort collector and comparison machinery exist. A complete result ledger establishing which cohort or transform won is not supplied. We cannot fill that gap by treating illustrative reports in a plan as measurements or by assuming a script's presence proves its full sweep completed.
 

@@ -6,7 +6,7 @@
 
 ## 1. Can audio and listening histories provide the evidence?
 
-The early plan paired pretrained audio representations with aggregate Last.fm counts. March collection revealed uneven discovery and an active-listener skew; expired preview URLs then separated “matched” tracks from actually embedded ones.
+The early plan paired pretrained audio representations with aggregate Last.fm counts. March collection revealed an active-listener skew, while audio availability limited which songs could supply training evidence.
 
 - **History:** [early plan](HISTORY.md#1-early-plan-learn-taste-from-music-and-listening-behavior) and [March collection](HISTORY.md#2-march-a-broad-dataset-was-already-a-selected-dataset).
 - **Detail:** [collection and representations](COMPONENTS.md#collection-and-representations).

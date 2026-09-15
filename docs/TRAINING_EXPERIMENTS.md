@@ -22,15 +22,13 @@ Users are split by numeric `user_id % 10` into training, validation, and test gr
 
 [hyperparam_sweep.py](../library/scripts/hyperparam_sweep.py) contains optimization and architectural comparisons. The April 22 checkpoint reports an 18-trial sweep and a best validation Spearman of 0.719 for a longer-training trial. The stronger trials occupied a narrow reported range, which motivated looking beyond minor recipe changes.
 
-That result belongs to the historical checkpoint, not to a run of this curated snapshot. Later changes left a return-value mismatch between the sweep script and current training functions; [Components](COMPONENTS.md#preserved-defects-and-hazards) documents it. We preserved the source rather than repairing and rerunning the experiment.
+That result belongs to the historical checkpoint, not to a run of this curated snapshot. The original experiment was not rerun for this release.
 
 The listening test then found poor, narrowly clustered recommendations. A decent rank correlation among held-out library targets had not established useful catalog ranking. That observation motivated the dataset comparisons below; it did not prove that hyperparameters, representation, or model capacity were irrelevant.
 
 ## Dataset variants: what each change was meant to test
 
-The [dataset-experiment script](../library/scripts/dataset_experiments.py) defines 17 variants. Its shared recipe follows the earlier longer-training trial, with batch size increased from 32 to 128 and early-stopping patience reduced from 8 to 4. Source comments explain these as practical choices for the larger corpus and comparison sweep, not measured improvements in discovery quality.
-
-The order intentionally front-loads a control, low-play filtering, a score transform, and overlap comparisons. That makes an interrupted sweep more informative than exhausting every variation in one family first.
+The [dataset-experiment script](../library/scripts/dataset_experiments.py) defines 17 variants. Its shared training recipe was intended to make the data-selection and target choices the main comparisons rather than retuning the network for each one.
 
 ### Change which users supply supervision
 
@@ -71,7 +69,7 @@ Combined variants test practical packages of choices. They cannot alone attribut
 
 ### What the comparison can and cannot tell us
 
-Keeping model settings fixed controls one part of the experiment. It does not freeze listener identities, event volume, target scale, candidate distribution, or evaluation difficulty. Preparation can also reuse existing artifacts incorrectly after writing a new configuration, and missing diversity scores bypass part of the intended filter. Those [preserved defects](COMPONENTS.md#preserved-defects-and-hazards) matter before interpreting a result.
+Keeping model settings fixed controls one part of the experiment. It does not freeze listener identities, event volume, target scale, candidate distribution, or evaluation difficulty. The [component guide](COMPONENTS.md#preserved-defects-and-hazards) separately records implementation limitations for anyone inspecting or continuing the source.
 
 The source establishes the variants and their intended questions. The archive does not supply a verified complete outcome for each one. A continuation should evaluate them on a common independently frozen task, report retained users/tracks and preprocessing identities, and distinguish improved coverage from improved prediction.
 
